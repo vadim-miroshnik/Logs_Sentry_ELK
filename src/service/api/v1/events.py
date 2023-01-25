@@ -21,6 +21,6 @@ router = APIRouter()
 async def test(request: Request, stor: Mongodb[ViewEvent] = Depends(get_mongodb_view_events)
 ) -> str:
     event: ViewEvent = ViewEvent(user_id='test', movie_id='test', viewed_frame=100)
-    # await stor.insert(event)
+    await stor.insert(event)
     await stor.select("test")
     return ""

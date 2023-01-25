@@ -19,10 +19,10 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup_event():
-    mongodb.mongodb = pymongo.MongoClient(settings.mongodb.host, settings.mongodb.port, connect=False)
-
-    kafka.producer = AIOKafkaProducer(bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}")
-    await kafka.producer.start()
+    # mongodb.mongodb = pymongo.MongoClient(settings.mongodb.host, settings.mongodb.port, connect=True, directconnection=True, serverselectiontimeoutms=2000)
+    mongodb.mongodb = pymongo.MongoClient("mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000")
+    # kafka.producer = AIOKafkaProducer(bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}")
+    # await kafka.producer.start()
 
 
 @app.on_event("shutdown")
