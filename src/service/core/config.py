@@ -20,9 +20,16 @@ class Kafka(BaseModel):
     port: int = Field(9092)
 
 
+class MongoDB(BaseModel):
+    host: str = Field("127.0.0.1")
+    port: int = Field(21017)
+    db: str = Field("movies")
+
+
 class Settings(BaseSettings):
     app: App = App()
     kafka: Kafka = Kafka()
+    mongodb: MongoDB
     project_name: str = Field("ugc")
     debug: bool = Field(False)
 

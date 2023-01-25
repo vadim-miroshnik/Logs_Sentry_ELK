@@ -1,13 +1,13 @@
 import asyncio
-
+import pymongo
 import uvicorn
 from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import watching
+from api.v1 import watching, events
 from core.config import settings
-from db import kafka
+from db import kafka, mongodb
 
 app = FastAPI(
     title=settings.project_name,
@@ -19,6 +19,8 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup_event():
+    mongodb.mongodb = pymongo.MongoClient(settings.mongodb.host, settings.mongodb.port, connect=False)
+
     kafka.producer = AIOKafkaProducer(bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}")
     await kafka.producer.start()
 
@@ -29,6 +31,7 @@ async def shutdown_event():
 
 
 app.include_router(watching.router, prefix="/api/v1/watching", tags=["films"])
+app.include_router(events.router, prefix="/api/v1/events", tags=["events"])
 
 if __name__ == "__main__":
     uvicorn.run(
