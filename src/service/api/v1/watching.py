@@ -5,7 +5,7 @@ from uuid import UUID
 from aiokafka import AIOKafkaProducer
 from fastapi import APIRouter, Depends, Request
 
-from api.v1.schemes import WatchingResponse
+from api.v1.schemas import WatchingResponse
 from db.kafka import get_kafka_producer
 
 from auth.auth_bearer import JWTBearer
@@ -37,7 +37,6 @@ async def watched_movies(
     summary="",
     description="",
     response_description="",
-    tags=["events"],
 )
 async def get_access_token(user_id: str | None = None) -> str:
     if not user_id:
