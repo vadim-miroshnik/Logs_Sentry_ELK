@@ -1,0 +1,37 @@
+@startuml
+skinparam componentStyle uml2
+actor Admin
+actor User
+component AdminWebApp #lightgreen
+component AsyncService #lightgreen
+component AuthService #lightgreen
+component ETL_1 #lightgreen
+component ETL_2 #lightgreen
+component ETL_3 #lightgreen
+database sqlite #yellow
+database Postgres #yellow
+database ElasticSearch #yellow
+database Redis #yellow
+database Kafka #orange
+database Clickhouse #yellow
+
+Admin -> AdminWebApp: manage movies
+AdminWebApp -down-> Postgres: CRUD movies
+sqlite -down-> ETL_1: legacy storage
+ETL_1 -> Postgres: init load
+Postgres -down-> ETL_2: new movies & updates
+ETL_2 -down-> ElasticSearch: update indexes
+ETL_2 -left-> Redis: state storage
+
+User -> AuthService: Login/Logout
+AsyncService -> Redis: cache
+AuthService -> Postgres: CRUD users/roles
+Admin -> AuthService: manage roles
+AuthService -down-> Redis: storage refresh-tokens
+User -> AsyncService: search movies
+AsyncService -> ElasticSearch: get movies
+AsyncService -down-> Kafka: view events
+Kafka -down-> ETL_3: queue of events
+ETL_3 -down-> Clickhouse: data for analysis
+
+@enduml

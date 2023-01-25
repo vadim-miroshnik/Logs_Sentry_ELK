@@ -1,0 +1,66 @@
+@startuml
+== login (Вход пользователя) ==
+WebClient -> AuthService: Request to login
+activate WebClient #gray
+activate AuthService #gray
+AuthService -> Postgres: Check user
+activate Postgres #gray
+Postgres --> AuthService: User
+Postgres --> AuthService: Encrypted password
+deactivate Postgres
+AuthService -> AuthService: Check password
+AuthService -> AuthService: Gen access-token
+AuthService -> AuthService: Gen refresh-token
+AuthService -> Postgres: Save login-event
+activate Postgres #gray
+Postgres --> AuthService:
+deactivate Postgres
+AuthService -> Redis: Save refresh-token in cache
+activate Redis #gray
+Redis --> AuthService:
+deactivate Redis
+alt#gold #lightgreen 201
+    AuthService --> WebClient: refresh-token
+    AuthService --> WebClient: access-token
+else #pink 400
+    AuthService --> WebClient: BAD REQUEST
+end
+deactivate AuthService
+deactivate WebClient
+
+== logout (Выход пользователя) ==
+WebClient -> AuthService: Request to logout
+activate WebClient #gray
+activate AuthService #gray
+AuthService -> AuthService: Check identity
+AuthService -> AuthService: Get cache key
+AuthService -> Redis: Delete refresh-token in cache
+activate Redis #gray
+Redis --> AuthService:
+deactivate Redis
+alt#gold #lightgreen 201
+    AuthService --> WebClient: CREATED
+else #pink 401
+    AuthService --> WebClient: UNAUTHORIZED
+end
+deactivate AuthService
+deactivate WebClient
+
+== logout-all (Выход пользователя со всех устройств) ==
+WebClient -> AuthService: Request to logout
+activate WebClient #gray
+activate AuthService #gray
+AuthService -> AuthService: Check identity
+AuthService -> AuthService: Get cache key for all devices
+AuthService -> Redis: Delete refresh-tokens in cache
+activate Redis #gray
+Redis --> AuthService:
+deactivate Redis
+alt#gold #lightgreen 201
+    AuthService --> WebClient: CREATED
+else #pink 401
+    AuthService --> WebClient: UNAUTHORIZED
+end
+deactivate AuthService
+deactivate WebClient
+@enduml

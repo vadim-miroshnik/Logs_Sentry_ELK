@@ -1,0 +1,56 @@
+@startuml
+== profile (Изменение профиля) ==
+WebClient -> AuthService: Request to change profile
+activate WebClient #gray
+activate AuthService #gray
+AuthService -> AuthService: Check identity
+AuthService -> AuthService: Validate new password
+AuthService -> Postgres: Save user data
+activate Postgres #gray
+Postgres --> AuthService: User
+deactivate Postgres
+alt#gold #lightgreen 201
+    AuthService --> WebClient: User
+else #pink 400
+    AuthService --> WebClient: BAD REQUEST
+else #pink 401
+    AuthService --> WebClient: UNAUTHORIZED
+end
+deactivate AuthService
+deactivate WebClient
+
+== history (История входов) ==
+WebClient -> AuthService: Request to history of logins
+activate WebClient #gray
+activate AuthService #gray
+AuthService -> AuthService: Check identity
+AuthService -> Postgres: Get history
+activate Postgres #gray
+Postgres --> AuthService: History records
+deactivate Postgres
+alt#gold #lightgreen 200
+    AuthService --> WebClient: History records
+else #pink 401
+    AuthService --> WebClient: UNAUTHORIZED
+end
+deactivate AuthService
+deactivate WebClient
+
+== refresh (Обновление токена) ==
+WebClient -> AuthService: Request to refresh token
+activate WebClient #gray
+activate AuthService #gray
+AuthService -> Redis: Get user name and roles
+activate Redis #gray
+Redis --> AuthService
+deactivate Redis
+AuthService -> AuthService: Gen access-token
+alt#gold #lightgreen 201
+    AuthService --> WebClient: access-token
+else #pink 400
+    AuthService --> WebClient: BAD REQUEST
+end
+deactivate AuthService
+deactivate WebClient
+
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+== register (Регистрация пользователя) ==
+WebClient -> AuthService: Request to register
+activate WebClient #gray
+activate AuthService  #gray
+AuthService -> Postgres #red: Check user
+activate Postgres  #gray
+Postgres --> AuthService: User
+deactivate Postgres
+    AuthService -> AuthService: Validate password
+AuthService -> Postgres: Add user
+activate Postgres  #gray
+Postgres --> AuthService: User
+AuthService -> AuthService: Gen access-token
+AuthService -> AuthService: Gen refresh-token
+AuthService -> Postgres: Save login-event
+Postgres --> AuthService:
+deactivate Postgres
+AuthService -> Redis: Save refresh-token in cache
+activate Redis  #gray
+Redis --> AuthService:
+deactivate Redis
+alt#gold #lightgreen 201
+    AuthService --> WebClient: refresh-token
+    AuthService --> WebClient: access-token
+else #pink 400
+    AuthService --> WebClient: BAD REQUEST
+end
+deactivate AuthService
+
+@enduml

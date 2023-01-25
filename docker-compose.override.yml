@@ -1,0 +1,9 @@
+services:
+
+  ugc:
+    build: ./src/service
+    ports:
+      - 8000:8000
+#    environment:
+#      DEBUG: "True"
+
