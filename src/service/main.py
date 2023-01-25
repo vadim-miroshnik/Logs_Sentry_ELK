@@ -5,7 +5,7 @@ from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
-from api.v1 import watching
+from api.v1 import watching, reviews
 from core.config import settings
 from db import kafka
 
@@ -29,6 +29,8 @@ async def shutdown_event():
 
 
 app.include_router(watching.router, prefix="/api/v1/watching", tags=["films"])
+app.include_router(reviews.router, prefix="/api/v1/reviews", tags=["reviews"])
+
 
 if __name__ == "__main__":
     uvicorn.run(
