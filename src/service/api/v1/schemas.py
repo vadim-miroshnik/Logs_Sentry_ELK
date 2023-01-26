@@ -11,13 +11,6 @@ class WatchingResponse(BaseModel):
     frame: str
 
 
-class ReviewRequest(BaseModel):
-    review_id: UUID
-    text: str | None = None
-    pub_dt: datetime | None = None
-    score: int
-
-
 class ReviewResponse(BaseModel):
     review_id: UUID
     text: str | None = None
@@ -25,18 +18,8 @@ class ReviewResponse(BaseModel):
     score: int
 
 
-class ScoreReviewRequest(BaseModel):
-    review_id: UUID
-    score: int
-
-
 class ScoreReviewResponse(BaseModel):
     review_id: UUID
-    score: int
-
-
-class ScoreRequest(BaseModel):
-    movie_id: UUID
     score: int
 
 
@@ -46,3 +29,7 @@ class ScoreResponse(BaseModel):
     avg_score: float
     like_cnt: int
     dislike_cnt: int
+
+
+class BookmarkResponse(BaseModel):
+    movie_id: UUID
