@@ -3,6 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Header, Request, Body
 from auth.auth_bearer import JWTBearer
 from .schemas import ScoreResponse
+from db.kafka_service import get_kafka_service
+from storage.kafka import KafkaService
 
 router = APIRouter()
 
@@ -20,6 +22,7 @@ async def add_score(
     request: Request,
     movie_id: UUID = Body(default=None),
     score: int = Body(default=None),
+    kafka: KafkaService = Depends(get_kafka_service)
 ):
     user = request.state.user_id
     return ScoreResponse()

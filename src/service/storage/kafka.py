@@ -1,8 +1,14 @@
 from typing import Generic, List, cast, Type, Tuple
 from .interface import Storage, T
 from aiokafka import AIOKafkaProducer
+from aioredis import Redis
 
+class KafkaService:
+    def __init__(self, cache: Redis, producer: AIOKafkaProducer):
+        self.cache = cache
+        self.producer = producer
 
+'''
 class Kafka(Generic[T], Storage[T]):
 
     def __init__(self, producer: AIOKafkaProducer):
@@ -39,3 +45,4 @@ class Kafka(Generic[T], Storage[T]):
 
     async def select_items(self, query: str, fltr: dict, **kwargs) -> List[T]:
         pass
+'''
