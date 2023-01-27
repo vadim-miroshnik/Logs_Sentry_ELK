@@ -11,10 +11,16 @@ router = APIRouter()
 
 @router.post(
     "/add-review",
-    response_model=ReviewResponse,
+    # response_model=ReviewResponse,
+    responses={
+        201: {
+            "model": ReviewResponse,
+            "description": "Add review",
+        }
+    },
     summary="Создание рецензии на фильм",
     description="При создании рецензии передается текст, дата публикации и оценка фильма. При обновлении рецензии передается её идентификатор",
-    response_description="Рецензия",
+    # response_description="Рецензия",
     tags=["reviews"],
     dependencies=[Depends(JWTBearer())],
 )

@@ -5,6 +5,7 @@ from aiokafka import AIOKafkaProducer
 import aioredis
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from fastapi.openapi.utils import get_openapi
 
 from api.v1 import watching, reviews, movies, bookmarks
 from core.config import settings
@@ -18,6 +19,29 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
     swagger_ui_parameters={"syntaxHighlight": False}
 )
+
+def custom_openapi():
+    if not app.openapi_schema:
+        app.openapi_schema = get_openapi(
+            title="",
+            version="1.0.0",
+            openapi_version="3.0.0",
+            description="",
+            routes=app.routes,
+            tags="",
+            servers="",
+        )
+        for _, method_item in app.openapi_schema.get('paths').items():
+            for _, param in method_item.items():
+                responses = param.get('responses')
+                if '422' in responses:
+                    del responses['422']
+                if '200' in responses:
+                    del responses['200']
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
 
 
 @app.on_event("startup")
