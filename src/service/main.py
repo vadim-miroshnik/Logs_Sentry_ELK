@@ -2,7 +2,6 @@ import asyncio
 
 import uvicorn
 from aiokafka import AIOKafkaProducer
-import aioredis
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.openapi.utils import get_openapi
@@ -10,7 +9,6 @@ from fastapi.openapi.utils import get_openapi
 from api.v1 import watching, reviews, movies, bookmarks
 from core.config import settings
 from db import kafka
-from db import redis
 
 app = FastAPI(
     title=settings.project_name,
@@ -23,7 +21,7 @@ app = FastAPI(
 def custom_openapi():
     if not app.openapi_schema:
         app.openapi_schema = get_openapi(
-            title="",
+            title=settings.project_name,
             version="1.0.0",
             openapi_version="3.0.0",
             description="",
@@ -49,17 +47,10 @@ async def startup_event():
     kafka.producer = AIOKafkaProducer(bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}")
     await kafka.producer.start()
 
-    redis.redis = await aioredis.create_redis_pool(
-        address=(settings.redis.host, settings.redis.port), minsize=10, maxsize=20
-    )
-
 
 @app.on_event("shutdown")
 async def shutdown_event():
     await kafka.producer.stop()
-
-    redis.redis.close()
-    await redis.redis.wait_closed()
 
 
 app.include_router(watching.router, prefix="/api/v1/watching", tags=["films"])
