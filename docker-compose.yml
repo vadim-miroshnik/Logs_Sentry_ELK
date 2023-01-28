@@ -13,7 +13,6 @@ services:
       APP__ALGORITHM: HS256
     depends_on:
       - broker
-      - redis
     env_file:
       - .env
 
@@ -29,14 +28,6 @@ services:
       - movies
     depends_on:
       - ugc
-
-  redis:
-    container_name: redis
-    image: 'bitnami/redis:latest'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    networks:
-      - movies
 
 networks:
     movies:
