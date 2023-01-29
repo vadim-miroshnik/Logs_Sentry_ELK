@@ -5,10 +5,11 @@ from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi.openapi.utils import get_openapi
+import pymongo
 
 from api.v1 import watching, reviews, movies, bookmarks
 from core.config import settings
-from db import kafka
+from db import kafka, mongodb
 
 app = FastAPI(
     title=settings.project_name,
@@ -47,10 +48,15 @@ async def startup_event():
     kafka.producer = AIOKafkaProducer(bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}")
     await kafka.producer.start()
 
+    # mongodb.mongodb = pymongo.MongoClient(
+    #    "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000")
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
     await kafka.producer.stop()
+
+    await mongodb.mongodb.close()
 
 
 app.include_router(watching.router, prefix="/api/v1/watching", tags=["films"])

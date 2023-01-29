@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from uuid import UUID
+import uuid
 import json
 from bson import json_util
 
@@ -8,6 +9,8 @@ from auth.auth_bearer import JWTBearer
 from .schemas import BookmarkResponse
 from db.kafka_service import get_kafka_service
 from storage.kafka import KafkaService
+from services.bookmarks import BookmarksService
+from db.mongodb import get_mongodb_bookmarks
 
 router = APIRouter()
 
@@ -21,25 +24,28 @@ router = APIRouter()
         },
     },
     summary="Добавление закладки на фильм",
-    description="Добавление/изменение/удаление закладки на фильм",
+    description="Добавление закладки на фильм",
     tags=["bookmarks"],
     dependencies=[Depends(JWTBearer())]
 )
 async def add_bookmark(
     request: Request,
-    movie_id: UUID = Body(default=None),
-    kafka: KafkaService = Depends(get_kafka_service)
+    movie_id: UUID = Query(default=uuid.uuid4()),
+    kafka: KafkaService = Depends(get_kafka_service),
+    service: BookmarksService = Depends(get_mongodb_bookmarks)
 ) -> BookmarkResponse:
     user = request.state.user_id
+    await service.add(user, movie_id)
     await kafka.send(
         "bookmarks",
         f"{user}+{movie_id}",
-        "1",
+        "1".encode("utf-8"),
     )
     return BookmarkResponse(
         user_id=user,
         movie_id=movie_id,
     )
+
 
 
 @router.get(
@@ -55,9 +61,13 @@ async def add_bookmark(
     tags=["bookmarks"],
     dependencies=[Depends(JWTBearer())]
 )
-async def get_bookmark(request: Request) -> list[BookmarkResponse]:
+async def get_bookmark(
+    request: Request,
+    service: BookmarksService = Depends(get_mongodb_bookmarks)
+) -> list[BookmarkResponse]:
     user = request.state.user_id
-    return None
+    return await service.get(user)
+    # return None
 
 
 @router.delete(

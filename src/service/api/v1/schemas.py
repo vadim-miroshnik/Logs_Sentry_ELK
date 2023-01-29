@@ -35,5 +35,6 @@ class ScoreResponse(UUIDMixin, BaseModel):
     dislike_cnt: int | None = None
 
 
-class BookmarkResponse(UUIDMixin, BaseModel):
-    pass
+class BookmarkResponse(BaseModel):
+    user_id: UUID
+    movie_id: UUID

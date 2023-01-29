@@ -1,41 +1,36 @@
-from typing import Generic, List, cast, Type, Tuple
-from .interface import Storage, T
+from typing import List
+from .interface import Storage
 import pymongo
 
 
-class Mongodb(Generic[T], Storage[T]):
+class Mongodb(Storage):
 
-    def __init__(self, mongodb: pymongo.MongoClient):
+    def __init__(self, mongodb: pymongo.MongoClient, db: str, coll: str):
         self.mongodb = mongodb
-        self.db = mongodb["movies"]
+        self.db = db
+        self.coll = coll
 
-        cls = cast(Mongodb, self.__class__)
-        if cls.__args:
-            self.ref = cls.__args[0]
+    async def insert(self, item: dict) -> dict:
+        print(f"{self.db} -- {self.coll} -- {item}")
+        # print(self.mongodb)
+        print(self.mongodb[self.db])
+        print(self.mongodb[self.db][self.coll])
+        return await self.mongodb[self.db][self.coll].insert_one(item)
 
-        self.coll = self.db[self.ref.__name__.lower()]
-        print(self.coll)
+    async def select(self, item: dict) -> dict:
+        print(f"{self.db} -- {self.coll} -- {item}")
+        return await self.mongodb[self.db][self.coll].find_one(item)
 
-    def __class_getitem__(cls, *args) -> Type["Mongodb"]:
-        cls.__args = cast(Tuple[Type[T]], args)
-        return super().__class_getitem__(*args)
+    async def delete(self, item: dict) -> None:
+        return await self.mongodb[self.db][self.coll].delete_one(item)
 
-    async def insert(self, item: T) -> None:
-        id = self.coll.insert_one(item.__dict__).inserted_id
-        print(id)
+    async def update(self, item: dict, prop: dict) -> bool:
+        print(f"{self.db} -- {self.coll} -- {item} -- {prop}")
+        return await self.mongodb[self.db][self.coll].update_one(item, prop)
 
-    async def insert_chunk(self, items: List[T], **kwargs) -> None:
-        pass
+    async def select_items(self, fltr: dict, **kwargs) -> list:
+        return await self.mongodb[self.db][self.coll].find(fltr)
 
-    async def select(self, id: str) -> T:
-        obj = self.coll.find_one({"user_id": id})
-        print(obj)
 
-    async def delete(self, id: str) -> bool:
-        pass
-
-    async def update(self, id: T) -> bool:
-        pass
-
-    async def select_items(self, query: str, fltr: dict, **kwargs) -> List[T]:
-        pass
+def get_collection(client: pymongo.MongoClient, db: str, coll: str) -> Mongodb:
+    return Mongodb(client, db, coll)
