@@ -7,7 +7,7 @@ from services.bookmarks import BookmarksService
 mongodb: pymongo.MongoClient | None = None
 
 mongodb = pymongo.MongoClient(
-        "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=5000")
+        "mongodb://mongos1:27017/?serverSelectionTimeoutMS=2000&directConnection=true")
 # async def get_mongodb_client():
 #    return mongodb
 

@@ -12,6 +12,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/data1:/data/db
+    networks:
+      - movies
 
   mongors1n2:
     container_name: mongors1n2
@@ -24,6 +26,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/data2:/data/db
+    networks:
+      - movies
 
   mongors1n3:
     container_name: mongors1n3
@@ -36,6 +40,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/data3:/data/db
+    networks:
+      - movies
 
   mongors2n1:
     container_name: mongors2n1
@@ -48,6 +54,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/data4:/data/db
+    networks:
+      - movies
 
   mongors2n2:
     container_name: mongors2n2
@@ -60,6 +68,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/data5:/data/db
+    networks:
+      - movies
 
   mongors2n3:
     container_name: mongors2n3
@@ -72,6 +82,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/data6:/data/db
+    networks:
+      - movies
 
   mongocfg1:
     container_name: mongocfg1
@@ -82,6 +94,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/config1:/data/db
+    networks:
+      - movies
 
   mongocfg2:
     container_name: mongocfg2
@@ -92,6 +106,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/config2:/data/db
+    networks:
+      - movies
 
   mongocfg3:
     container_name: mongocfg3
@@ -102,6 +118,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /tmp/mongo_cluster/config3:/data/db
+    networks:
+      - movies
 
   mongos1:
     container_name: mongos1
@@ -116,6 +134,8 @@ services:
       - "27017"
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    networks:
+      - movies
 
   mongos2:
     container_name: mongos2
@@ -130,3 +150,9 @@ services:
       - "27017"
     volumes:
       - /etc/localtime:/etc/localtime:ro
+    networks:
+      - movies
+
+networks:
+    movies:
+      name: movies

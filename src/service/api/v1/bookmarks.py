@@ -35,7 +35,7 @@ async def add_bookmark(
     service: BookmarksService = Depends(get_mongodb_bookmarks)
 ) -> BookmarkResponse:
     user = request.state.user_id
-    await service.add(user, movie_id)
+    await service.add(user, str(movie_id))
     await kafka.send(
         "bookmarks",
         f"{user}+{movie_id}",
@@ -45,7 +45,6 @@ async def add_bookmark(
         user_id=user,
         movie_id=movie_id,
     )
-
 
 
 @router.get(
@@ -67,7 +66,6 @@ async def get_bookmark(
 ) -> list[BookmarkResponse]:
     user = request.state.user_id
     return await service.get(user)
-    # return None
 
 
 @router.delete(
@@ -84,13 +82,15 @@ async def get_bookmark(
 )
 async def delete_bookmark(
     request: Request,
-    movie_id: UUID = Body(default=None),
-    kafka: KafkaService = Depends(get_kafka_service)
+    movie_id: UUID = Query(default=uuid.uuid4()),
+    kafka: KafkaService = Depends(get_kafka_service),
+    service: BookmarksService = Depends(get_mongodb_bookmarks)
 ) -> None:
     user = request.state.user_id
     await kafka.send(
         "bookmarks",
         f"{user}+{movie_id}",
-        "0",
+        "0".encode("utf-8"),
     )
+    await service.delete(user, str(movie_id))
 
