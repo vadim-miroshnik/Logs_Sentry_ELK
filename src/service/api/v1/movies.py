@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/add-score",
+    "/add",
     responses={
         int(HTTPStatus.CREATED): {
             "model": ScoreResponse,
@@ -54,15 +54,15 @@ async def add_score(
 
 
 @router.patch(
-    "/update-score",
+    "/update",
     responses={
         int(HTTPStatus.CREATED): {
             "model": ScoreResponse,
             "description": "Successful Response",
         },
     },
-    summary="Добавление оценки к фильму",
-    description="Добавление/изменение/удаление оценки к фильму",
+    summary="Изменение оценки к фильму",
+    description="Изменение оценки к фильму",
     tags=["movies"],
     dependencies=[Depends(JWTBearer())],
 )
@@ -93,7 +93,7 @@ async def update_score(
 
 
 @router.delete(
-    "/",
+    "/delete",
     responses={
         int(HTTPStatus.NO_CONTENT): {
             "model": None,

@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/",
+    "/add",
     responses={
         int(HTTPStatus.CREATED): {
             "model": BookmarkResponse,
@@ -48,7 +48,7 @@ async def add_bookmark(
 
 
 @router.get(
-    "/",
+    "/get",
     responses={
         int(HTTPStatus.OK): {
             "model": list[BookmarkResponse],
@@ -69,7 +69,7 @@ async def get_bookmark(
 
 
 @router.delete(
-    "/",
+    "/delete",
     responses={
         int(HTTPStatus.NO_CONTENT): {
             "model": None,
