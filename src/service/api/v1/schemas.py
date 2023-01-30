@@ -1,5 +1,6 @@
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
@@ -12,8 +13,8 @@ class WatchingResponse(BaseModel):
 
 
 class UUIDMixin(BaseModel):
-    user_id: UUID
-    movie_id: UUID
+    user_id: UUID | None = None
+    movie_id: UUID | None = None
 
 
 class ReviewResponse(UUIDMixin, BaseModel):

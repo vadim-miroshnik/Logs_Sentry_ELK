@@ -23,7 +23,8 @@ class Mongodb(Storage):
         return self.mongodb[self.db][self.coll].update_one(item, prop)
 
     async def select_items(self, fltr: dict, **kwargs) -> list:
-        return self.mongodb[self.db][self.coll].find(fltr)
+        cursor = self.mongodb[self.db][self.coll].find(fltr)
+        return list(cursor)
 
 
 def get_collection(client: pymongo.MongoClient, db: str, coll: str) -> Mongodb:

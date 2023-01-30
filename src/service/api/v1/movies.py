@@ -1,15 +1,18 @@
-from http import HTTPStatus
-import uuid
-from uuid import UUID
 import json
-from bson import json_util
-from fastapi import APIRouter, Depends, HTTPException, Query, Header, Request, Body
+import uuid
+from http import HTTPStatus
+from uuid import UUID
+
 from auth.auth_bearer import JWTBearer
-from .schemas import ScoreResponse
+from bson import json_util
 from db.kafka_service import get_kafka_service
-from storage.kafka import KafkaService
-from services.movies import MoviesService
 from db.mongodb import get_mongodb_movies
+from fastapi import (APIRouter, Body, Depends, Header, HTTPException, Query,
+                     Request)
+from services.movies import MoviesService
+from storage.kafka import KafkaService
+
+from .schemas import ScoreResponse
 
 router = APIRouter()
 
@@ -32,7 +35,7 @@ async def add_score(
     movie_id: UUID = Query(default=uuid.uuid4()),
     score: int = Query(default=None),
     kafka: KafkaService = Depends(get_kafka_service),
-    service: MoviesService = Depends(get_mongodb_movies)
+    service: MoviesService = Depends(get_mongodb_movies),
 ) -> ScoreResponse:
     user = request.state.user_id
     await service.add(user, str(movie_id), score)
@@ -46,11 +49,7 @@ async def add_score(
         f"{user}+{movie_id}",
         json.dumps(data, default=json_util.default).encode("utf-8"),
     )
-    return ScoreResponse(
-        user_id=user,
-        movie_id=movie_id,
-        score=score
-    )
+    return ScoreResponse(user_id=user, movie_id=movie_id, score=score)
 
 
 @router.patch(
@@ -71,7 +70,7 @@ async def update_score(
     movie_id: UUID = Query(default=uuid.uuid4()),
     score: int = Query(default=None),
     kafka: KafkaService = Depends(get_kafka_service),
-    service: MoviesService = Depends(get_mongodb_movies)
+    service: MoviesService = Depends(get_mongodb_movies),
 ):
     user = request.state.user_id
     await service.update(user, str(movie_id), score)
@@ -85,11 +84,7 @@ async def update_score(
         f"{user}+{movie_id}",
         json.dumps(data, default=json_util.default).encode("utf-8"),
     )
-    return ScoreResponse(
-        user_id=user,
-        movie_id=movie_id,
-        score=score
-    )
+    return ScoreResponse(user_id=user, movie_id=movie_id, score=score)
 
 
 @router.delete(
@@ -102,13 +97,13 @@ async def update_score(
     },
     summary="Удаление оценки",
     tags=["movies"],
-    dependencies=[Depends(JWTBearer())]
+    dependencies=[Depends(JWTBearer())],
 )
 async def delete_score(
     request: Request,
     movie_id: UUID = Query(default=uuid.uuid4()),
     kafka: KafkaService = Depends(get_kafka_service),
-    service: MoviesService = Depends(get_mongodb_movies)
+    service: MoviesService = Depends(get_mongodb_movies),
 ) -> None:
     user = request.state.user_id
     await service.delete(user, str(movie_id))
@@ -131,7 +126,7 @@ async def delete_score(
 async def get_score(
     request: Request,
     movie_id: UUID = Query(default=uuid.uuid4()),
-    service: MoviesService = Depends(get_mongodb_movies)
+    service: MoviesService = Depends(get_mongodb_movies),
 ) -> ScoreResponse:
     user = request.state.user_id
     res = await service.get(str(movie_id))
@@ -139,5 +134,5 @@ async def get_score(
         user_id=user,
         movie_id=movie_id,
         score=res.get("scores"),
-        avg_score=res.get("rating")
+        avg_score=res.get("rating"),
     )

@@ -1,21 +1,25 @@
+import json
 import uuid
+from datetime import datetime
 from http import HTTPStatus
 from uuid import UUID
-from datetime import datetime
-import json
-from bson import json_util
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Header, Request, Body
 from auth.auth_bearer import JWTBearer
-from .schemas import ReviewResponse
-from storage.kafka import KafkaService
+from bson import json_util
 from db.kafka_service import get_kafka_service
+from db.mongodb import get_mongodb_reviews
+from fastapi import (APIRouter, Body, Depends, Header, HTTPException, Query,
+                     Request)
+from services.reviews import ReviewsService
+from storage.kafka import KafkaService
+
+from .schemas import ReviewResponse
 
 router = APIRouter()
 
 
 @router.post(
-    "/add-review",
+    "/add",
     responses={
         int(HTTPStatus.CREATED): {
             "model": ReviewResponse,
@@ -29,12 +33,14 @@ router = APIRouter()
 )
 async def add_review(
     request: Request,
-    movie_id: UUID = Body(default=None),
-    text: str = Body(default=None),
-    score: int = Body(default=None),
+    movie_id: UUID = Query(default=uuid.uuid4()),
+    text: str = Query(default=None),
+    score: int = Query(default=None),
     kafka: KafkaService = Depends(get_kafka_service),
+    service: ReviewsService = Depends(get_mongodb_reviews),
 ):
     user = request.state.user_id
+    await service.add(user, str(movie_id), text)
     data = {
         "user_id": user,
         "review_id": str(uuid.uuid4()),
@@ -59,7 +65,7 @@ async def add_review(
 
 
 @router.patch(
-    "/update-review",
+    "/update",
     responses={
         int(HTTPStatus.CREATED): {
             "model": ReviewResponse,
@@ -73,12 +79,14 @@ async def add_review(
 )
 async def update_review(
     request: Request,
-    review_id: UUID = Body(default=None),
-    text: str = Body(default=None),
-    score: int = Body(default=None),
+    review_id: UUID = Query(default=uuid.uuid4()),
+    text: str = Query(default=None),
+    score: int = Query(default=None),
     kafka: KafkaService = Depends(get_kafka_service),
-):
+    service: ReviewsService = Depends(get_mongodb_reviews),
+) -> ReviewResponse:
     user = request.state.user_id
+    await service.update(str(review_id), text)
     data = {
         "user_id": user,
         "review_id": review_id,
@@ -93,16 +101,15 @@ async def update_review(
     )
     return ReviewResponse(
         user_id=user,
-        review_id=data.review_id,
-        movie_id="", # movie_id,
+        review_id=data["review_id"],
         text=text,
         score=score,
-        pub_dt=data.pub_dt,
+        pub_dt=data["pub_dt"],
     )
 
 
 @router.post(
-    "/score-review",
+    "/add-score",
     responses={
         int(HTTPStatus.CREATED): {
             "model": ReviewResponse,
@@ -116,11 +123,13 @@ async def update_review(
 )
 async def score_review(
     request: Request,
-    review_id: UUID = Body(default=None),
-    score: int = Body(default=None),
-    kafka: KafkaService = Depends(get_kafka_service)
-):
+    review_id: UUID = Query(default=uuid.uuid4()),
+    score: int = Query(default=None),
+    kafka: KafkaService = Depends(get_kafka_service),
+    service: ReviewsService = Depends(get_mongodb_reviews),
+) -> ReviewResponse:
     user = request.state.user_id
+    await service.add_score(str(review_id), user, score)
     data = {
         "review_id": uuid.uuid4(),
         "score": score,
@@ -132,8 +141,40 @@ async def score_review(
     )
     return ReviewResponse(
         user_id=user,
-        review_id=data.review_id,
+        review_id=data["review_id"],
         score=score,
+    )
+
+
+@router.delete(
+    "/del-score",
+    responses={
+        int(HTTPStatus.NO_CONTENT): {
+            "model": None,
+            "description": "Successful Response",
+        },
+    },
+    summary="Удаление оценки рецензии на фильм",
+    description="Удаление оценки рецензии на фильм",
+    tags=["reviews"],
+    dependencies=[Depends(JWTBearer())],
+)
+async def del_score_review(
+    request: Request,
+    review_id: UUID = Query(default=uuid.uuid4()),
+    kafka: KafkaService = Depends(get_kafka_service),
+    service: ReviewsService = Depends(get_mongodb_reviews),
+) -> None:
+    user = request.state.user_id
+    await service.del_score(str(review_id), user)
+    data = {
+        "review_id": uuid.uuid4(),
+        "score": 0,
+    }
+    kafka.send(
+        "reviews",
+        f"{review_id}",
+        json.dumps(data, default=json_util.default).encode("utf-8"),
     )
 
 
@@ -146,13 +187,14 @@ async def score_review(
         },
     },
     summary="Получение списка рецензий",
-    description="Получение списка рецензий с возможностью гибкой сортировки",
+    description="Получение списка рецензий",
     tags=["reviews"],
-    dependencies=[Depends(JWTBearer())],
+    # dependencies=[Depends(JWTBearer())],
 )
 async def get_reviews(
     request: Request,
-    movie_id: UUID = Body(default=None)
-):
+    movie_id: UUID = Query(default=uuid.uuid4()),
+    service: ReviewsService = Depends(get_mongodb_reviews),
+) -> list[ReviewResponse]:
     user = request.state.user_id
-    return None
+    return await service.get(movie_id)

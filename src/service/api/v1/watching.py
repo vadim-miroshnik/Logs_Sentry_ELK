@@ -3,13 +3,11 @@ import uuid
 from uuid import UUID
 
 from aiokafka import AIOKafkaProducer
-from fastapi import APIRouter, Depends, Request
-
 from api.v1.schemas import WatchingResponse
-from db.kafka import get_kafka_producer
-
 from auth.auth_bearer import JWTBearer
-from auth.auth_handler import encode_jwt, decode_jwt
+from auth.auth_handler import decode_jwt, encode_jwt
+from db.kafka import get_kafka_producer
+from fastapi import APIRouter, Depends, Request
 
 router = APIRouter()
 
@@ -24,7 +22,10 @@ logger = logging.getLogger(__name__)
     dependencies=[Depends(JWTBearer())],
 )
 async def watched_movies(
-    request: Request, frame: str, movie_id: UUID, kafka_producer: AIOKafkaProducer = Depends(get_kafka_producer)
+    request: Request,
+    frame: str,
+    movie_id: UUID,
+    kafka_producer: AIOKafkaProducer = Depends(get_kafka_producer),
 ):
     user = request.state.user_id
     await kafka_producer.send_and_wait(f"{user}{movie_id}", frame.encode("UTF-8"))
