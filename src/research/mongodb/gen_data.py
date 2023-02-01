@@ -9,7 +9,7 @@ mongodb = pymongo.MongoClient(
 stor = mongodb["movies"]["movies"]
 
 USERS_CNT = 10000
-MOVIES_CNT = 100000
+MOVIES_CNT = 1000000
 MIN_SCORE = 1
 MAX_SCORE = 10
 MAX_SCORES = 10000
