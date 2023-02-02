@@ -17,12 +17,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install wemake-python-styleguide flake8-html mypy lxml
+          pip install wemake-python-styleguide flake8-html
 
       - name: Create reports folders
         run: |
           mkdir -p reports/wemake/
-          mkdir -p reports/mypy/
 
       - name: Lint with flake8
         run: |
@@ -30,10 +29,6 @@ jobs:
           flake8 ./src/service --count --select=E9,F63,F7,F82 --show-source --statistics 
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 ./src/service --exit-zero --max-complexity=10 --max-line-length=127 --format=html --htmldir=reports/wemake/
-
-      - name: Lint with mypy
-        run: |
-          mypy ./src/service --html-report reports/mypy/ --follow-imports skip
 
       - name: Upload reports
         uses: actions/upload-artifact@v2
@@ -55,13 +50,28 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python_version }}
+        
+    - name: Create reports folders
+      run: |
+          mkdir -p reports/mypy/
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install mypy lxml
         pip install -r src/service/tests/requirements.txt
         if [ -f src/service/requirements.txt ]; then pip install -r src/service/requirements.txt; fi
-
+        
+    - name: Check dependicies with mypy
+      run: |
+          mypy ./src/service --html-report reports/mypy/ --follow-imports skip   
+          
+    - name: Upload reports
+      uses: actions/upload-artifact@v2
+      with:
+          name: reports
+          path: reports/
+          
     - name: Test with pytest
       run: |
         pytest src/service/tests/unit
