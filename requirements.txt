@@ -4,3 +4,6 @@ tqdm==4.64.1
 Faker==16.6.0
 clickhouse_driver==0.2.5
 
+
+bson~=0.5.10
+pymongo~=4.3.3

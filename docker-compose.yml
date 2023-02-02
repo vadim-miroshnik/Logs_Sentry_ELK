@@ -29,7 +29,6 @@ services:
     depends_on:
       - ugc
 
-
 networks:
     movies:
       name: movies

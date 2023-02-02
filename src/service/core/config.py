@@ -20,9 +20,15 @@ class Kafka(BaseModel):
     port: int = Field(9092)
 
 
+class Redis(BaseModel):
+    host: str = Field("127.0.0.1")
+    port: int = Field(6379)
+
+
 class Settings(BaseSettings):
     app: App = App()
     kafka: Kafka = Kafka()
+    redis: Redis = Redis()
     project_name: str = Field("ugc")
     debug: bool = Field(False)
 
