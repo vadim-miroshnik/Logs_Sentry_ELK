@@ -1,4 +1,6 @@
 import time
+from typing import Optional, Dict, Any
+
 import jwt
 from core.config import settings
 
@@ -15,7 +17,7 @@ def encode_jwt(user_id: str) -> dict[str, str]:
     }
 
 
-def decode_jwt(token: str) -> dict:
+def decode_jwt(token: str) -> Optional[Dict[Any, Any]]:
     try:
         decoded_token = jwt.decode(token, settings.app.jwt_secret_key, algorithms=[settings.app.algorithm])
         return decoded_token if decoded_token["exp"] >= time.time() else None
