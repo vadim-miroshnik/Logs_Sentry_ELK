@@ -64,7 +64,7 @@ jobs:
         
     - name: Check dependicies with mypy
       run: |
-          mypy ./src/service --html-report reports/mypy/ --follow-imports skip   
+          mypy ./src/service --html-report reports/mypy/ --ignore-missing-imports
           
     - name: Upload reports
       uses: actions/upload-artifact@v2
