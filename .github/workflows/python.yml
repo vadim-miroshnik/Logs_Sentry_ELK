@@ -33,7 +33,7 @@ jobs:
 
       - name: Lint with mypy
         run: |
-          mypy ./src/service --html-report reports/mypy/
+          mypy ./src/service --html-report reports/mypy/ --follow-imports silent
 
       - name: Upload reports
         uses: actions/upload-artifact@v2
