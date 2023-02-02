@@ -1,9 +1,11 @@
 import time
+from typing import Optional, Dict, Any
+
 import jwt
 from core.config import settings
 
 
-def encode_jwt(user_id: str) -> dict[str, str]:
+def encode_jwt(user_id: str) -> Optional[Dict[str, Any]]:
     payload = {
         "user_id": user_id,
         "exp": time.time() + 600
