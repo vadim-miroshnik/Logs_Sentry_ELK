@@ -1,6 +1,6 @@
 from aiokafka import AIOKafkaProducer
 
-queues = dict()
+queues: dict = {}
 
 
 class KafkaService:
