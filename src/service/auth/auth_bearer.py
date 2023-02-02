@@ -1,4 +1,6 @@
 from http import HTTPStatus
+from typing import Optional, Dict, Any
+
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import ORJSONResponse
@@ -22,7 +24,7 @@ class JWTBearer(HTTPBearer):
         else:
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Invalid authorization code.")
 
-    def verify_jwt(self, token: str) -> dict:
+    def verify_jwt(self, token: str) -> Optional[Dict[Any, Any]]:
         try:
             payload = decode_jwt(token)
         except:
