@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     redis: Redis = Redis()
     project_name: str = Field("ugc")
     debug: bool = Field(False)
+    sentry_dsn: str
 
     class Config:
         env_file = BASE_DIR.joinpath(".env")
