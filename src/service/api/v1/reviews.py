@@ -88,12 +88,12 @@ async def update_review(
     await service.update(str(review_id), text)
     data = {
         "user_id": user,
-        "review_id": review_id,
+        "review_id": str(review_id),
         "text": text,
         "pub_dt": datetime.now(),
         "score": score,
     }
-    kafka.send(
+    await kafka.send(
         "reviews",
         f"{review_id}",
         json.dumps(data, default=json_util.default).encode("utf-8"),
@@ -130,10 +130,10 @@ async def score_review(
     user = request.state.user_id
     await service.add_score(str(review_id), user, score)
     data = {
-        "review_id": uuid.uuid4(),
+        "review_id": str(uuid.uuid4()),
         "score": score,
     }
-    kafka.send(
+    await kafka.send(
         "reviews",
         f"{review_id}",
         json.dumps(data, default=json_util.default).encode("utf-8"),
@@ -167,10 +167,10 @@ async def del_score_review(
     user = request.state.user_id
     await service.del_score(str(review_id), user)
     data = {
-        "review_id": uuid.uuid4(),
+        "review_id": str(uuid.uuid4()),
         "score": 0,
     }
-    kafka.send(
+    await kafka.send(
         "reviews",
         f"{review_id}",
         json.dumps(data, default=json_util.default).encode("utf-8"),
@@ -196,4 +196,4 @@ async def get_reviews(
     service: ReviewsService = Depends(get_mongodb_reviews),
 ) -> list[ReviewResponse]:
     user = request.state.user_id
-    return await service.get(movie_id)
+    return await service.get(str(movie_id))

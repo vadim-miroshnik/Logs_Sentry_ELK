@@ -40,10 +40,10 @@ async def add_score(
     await service.add(user, str(movie_id), score)
     data = {
         "user_id": user,
-        "movie_id": movie_id,
+        "movie_id": str(movie_id),
         "score": score,
     }
-    kafka.send(
+    await kafka.send(
         "reviews",
         f"{user}+{movie_id}",
         json.dumps(data, default=json_util.default).encode("utf-8"),
@@ -75,10 +75,10 @@ async def update_score(
     await service.update(user, str(movie_id), score)
     data = {
         "user_id": user,
-        "movie_id": movie_id,
+        "movie_id": str(movie_id),
         "score": score,
     }
-    kafka.send(
+    await kafka.send(
         "reviews",
         f"{user}+{movie_id}",
         json.dumps(data, default=json_util.default).encode("utf-8"),

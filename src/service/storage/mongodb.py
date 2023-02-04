@@ -1,30 +1,29 @@
-from typing import List
 from .interface import Storage
-import pymongo
+from motor.motor_asyncio import AsyncIOMotorClient
 
 
 class Mongodb(Storage):
-    def __init__(self, mongodb: pymongo.MongoClient, db: str, coll: str):
+    def __init__(self, mongodb: AsyncIOMotorClient, db: str, coll: str):
         self.mongodb = mongodb
         self.db = db
         self.coll = coll
 
     async def insert(self, item: dict) -> dict:
-        return self.mongodb[self.db][self.coll].insert_one(item)
+        return await self.mongodb[self.db][self.coll].insert_one(item)
 
     async def select(self, item: dict) -> dict:
-        return self.mongodb[self.db][self.coll].find_one(item)
+        return await self.mongodb[self.db][self.coll].find_one(item)
 
     async def delete(self, item: dict) -> None:
-        return self.mongodb[self.db][self.coll].delete_one(item)
+        return await self.mongodb[self.db][self.coll].delete_one(item)
 
     async def update(self, item: dict, prop: dict) -> bool:
-        return self.mongodb[self.db][self.coll].update_one(item, prop)
+        return await self.mongodb[self.db][self.coll].update_one(item, prop)
 
     async def select_items(self, fltr: dict, **kwargs) -> list:
-        cursor = self.mongodb[self.db][self.coll].find(fltr)
+        cursor = await self.mongodb[self.db][self.coll].find(fltr)
         return list(cursor)
 
 
-def get_collection(client: pymongo.MongoClient, db: str, coll: str) -> Mongodb:
+def get_collection(client: AsyncIOMotorClient, db: str, coll: str) -> Mongodb:
     return Mongodb(client, db, coll)

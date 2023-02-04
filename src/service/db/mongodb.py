@@ -1,18 +1,18 @@
 from functools import lru_cache
-import pymongo
+from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import Depends
 from storage.mongodb import Mongodb, get_collection
 from services.bookmarks import BookmarksService
 from services.movies import MoviesService
 from services.reviews import ReviewsService
 
-mongodb: pymongo.MongoClient | None = None
+# mongodb: pymongo.MongoClient | None = None
+# mongodb = pymongo.MongoClient("mongodb://mongos1:27017/?serverSelectionTimeoutMS=2000&directConnection=true")
 
-mongodb = pymongo.MongoClient("mongodb://mongos1:27017/?serverSelectionTimeoutMS=2000&directConnection=true")
-
-# async def get_mongodb_client():
-#    return mongodb
-
+mongodb: AsyncIOMotorClient | None = None
+mongodb = AsyncIOMotorClient(
+    "mongodb://mongos1:27017/?serverSelectionTimeoutMS=2000&directConnection=true&uuidRepresentation=standard"
+)
 
 @lru_cache()
 def get_mongodb_bookmarks(mongo: Mongodb = Depends(get_collection(mongodb, "movies", "bookmarks"))) -> BookmarksService:
