@@ -6,6 +6,8 @@ https://github.com/dimkaddi/ugc_sprint_2
 
 Обновлено описание [здесь](src/research/README.md)
 
+## Работа с проектом
+
 запуск MongoDB: 
     
     make run_environment
