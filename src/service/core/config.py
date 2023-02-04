@@ -25,10 +25,16 @@ class Redis(BaseModel):
     port: int = Field(6379)
 
 
+class Mongo(BaseModel):
+    host: str = Field("127.0.0.1")
+    port: int = Field(27017)
+
+
 class Settings(BaseSettings):
     app: App = App()
     kafka: Kafka = Kafka()
     redis: Redis = Redis()
+    mongo: Mongo = Mongo()
     project_name: str = Field("ugc")
     debug: bool = Field(False)
     sentry_dsn: str
