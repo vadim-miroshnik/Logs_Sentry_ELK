@@ -1,14 +1,19 @@
 from functools import lru_cache
+
 import pymongo
 from fastapi import Depends
-from storage.mongodb import Mongodb, get_collection
 from services.bookmarks import BookmarksService
 from services.movies import MoviesService
 from services.reviews import ReviewsService
+from storage.mongodb import Mongodb, get_collection
+
+from core.config import settings
 
 mongodb: pymongo.MongoClient | None = None
 
-mongodb = pymongo.MongoClient("mongodb://mongos1:27017/?serverSelectionTimeoutMS=2000&directConnection=true")
+mongodb = pymongo.MongoClient(
+    f"mongodb://{settings.mongo.host}:{settings.mongo.port}/?serverSelectionTimeoutMS=2000&directConnection=true"
+)
 
 # async def get_mongodb_client():
 #    return mongodb
