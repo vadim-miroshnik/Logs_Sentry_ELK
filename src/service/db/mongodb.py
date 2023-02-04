@@ -1,6 +1,5 @@
 from functools import lru_cache
-
-import pymongo
+from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import Depends
 from services.bookmarks import BookmarksService
 from services.movies import MoviesService
@@ -9,14 +8,11 @@ from storage.mongodb import Mongodb, get_collection
 
 from core.config import settings
 
-mongodb: pymongo.MongoClient | None = None
 
-mongodb = pymongo.MongoClient(
-    f"mongodb://{settings.mongo.host}:{settings.mongo.port}/?serverSelectionTimeoutMS=2000&directConnection=true"
+mongodb: AsyncIOMotorClient | None = None
+mongodb = AsyncIOMotorClient(
+    "mongodb://mongos1:27017/?serverSelectionTimeoutMS=2000&directConnection=true&uuidRepresentation=standard"
 )
-
-# async def get_mongodb_client():
-#    return mongodb
 
 
 @lru_cache()
