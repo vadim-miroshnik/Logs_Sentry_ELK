@@ -1,10 +1,12 @@
+import random
 import time
 import uuid
+
 import pymongo
-import random
 
 mongodb = pymongo.MongoClient(
-            "mongodb://127.0.0.1:27017/?serverSelectionTimeoutMS=2000&directConnection=true&readPreference=primary")
+    "mongodb://127.0.0.1:27017/?serverSelectionTimeoutMS=2000&directConnection=true&readPreference=primary"
+)
 
 stor = mongodb["movies"]["movies"]
 
@@ -27,11 +29,7 @@ def gen_movie(movie_id: str, scores: list[dict]):
     rating = 0
     if len(scores) > 0:
         rating = sum(s.get("score") for s in scores) / len(scores)
-    return {
-        "_id": movie_id,
-        "scores": scores,
-        "rating": rating
-    }
+    return {"_id": movie_id, "scores": scores, "rating": rating}
 
 
 def generate_data():
@@ -51,5 +49,5 @@ if __name__ == "__main__":
     end = time.time()
     print(end - start)
     print(count)
-    with open("log.txt", 'a', encoding='utf-8') as file:
+    with open("log.txt", "a", encoding="utf-8") as file:
         file.write(f"Insert {count} movies = {str(end - start)}\n")

@@ -1,11 +1,12 @@
 import time
 from functools import wraps
-from pymongo import MongoClient, DESCENDING, cursor
 
-mongodb = MongoClient(
-            "mongodb://127.0.0.1:27017/?serverSelectionTimeoutMS=2000&directConnection=true")
+from pymongo import MongoClient, DESCENDING
+
+mongodb = MongoClient("mongodb://127.0.0.1:27017/?serverSelectionTimeoutMS=2000&directConnection=true")
 
 stor = mongodb["movies"]["movies"]
+
 
 def measure(func):
     @wraps(func)
@@ -16,7 +17,7 @@ def measure(func):
         finally:
             end = time.time()
             print(end - start)
-            with open("log.txt", 'a', encoding='utf-8') as file:
+            with open("log.txt", "a", encoding="utf-8") as file:
                 file.write(f"{str(end - start)}\n")
 
     return inner

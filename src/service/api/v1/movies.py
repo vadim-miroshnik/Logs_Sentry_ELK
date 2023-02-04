@@ -7,8 +7,7 @@ from auth.auth_bearer import JWTBearer
 from bson import json_util
 from db.kafka_service import get_kafka_service
 from db.mongodb import get_mongodb_movies
-from fastapi import (APIRouter, Body, Depends, Header, HTTPException, Query,
-                     Request)
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Query, Request
 from services.movies import MoviesService
 from storage.kafka import KafkaService
 

@@ -1,10 +1,9 @@
-""""""
-
 import time
 from functools import wraps
+
 import clickhouse_driver
 
-client = clickhouse_driver.Client(host='localhost')
+client = clickhouse_driver.Client(host="localhost")
 
 
 def measure(func):
@@ -16,7 +15,7 @@ def measure(func):
         finally:
             end = time.time()
             print(end - start)
-            with open("log.txt", 'a', encoding='utf-8') as file:
+            with open("log.txt", "a", encoding="utf-8") as file:
                 file.write(f"{str(end - start)}\n")
 
     return inner
@@ -45,7 +44,9 @@ if __name__ == "__main__":
     execute_query(query_movie_by_user)
 
     # 5
-    query_movie_user = "SELECT user_id, movie_id, COUNT(viewed_frame)/MAX(viewed_frame) FROM analysis.views GROUP BY user_id, movie_id"
+    query_movie_user = (
+        "SELECT user_id, movie_id, COUNT(viewed_frame)/MAX(viewed_frame) FROM analysis.views GROUP BY user_id, movie_id"
+    )
     execute_query(query_movie_user)
 
     # 6

@@ -1,5 +1,3 @@
-""""""
-
 import itertools
 import threading
 import uuid
@@ -54,9 +52,7 @@ def gen_events(users: dict, movies: list) -> list:
             movie_len = np.random.randint(min_len, max_len)
 
             # qty of attempts to view movie (max 5)
-            attempts = sorted(
-                np.random.randint(0, movie_len, size=np.random.randint(1, 5)).tolist()
-            )
+            attempts = sorted(np.random.randint(0, movie_len, size=np.random.randint(1, 5)).tolist())
             for i in range(len(attempts) - 1):
                 for frame in range(attempts[i : i + 2][0], attempts[i : i + 2][1]):
                     view = View(user_id=k, movie_id=movie, viewed_frame=frame)
@@ -67,10 +63,7 @@ def gen_events(users: dict, movies: list) -> list:
 def run_gen_events(users: dict, movies: list, threads: int = 2):
     # divide users between threads
     part = int(len(users) / threads)
-    usrs = [
-        dict(itertools.islice(users.items(), i * part, (i + 1) * part))
-        for i in range(threads)
-    ]
+    usrs = [dict(itertools.islice(users.items(), i * part, (i + 1) * part)) for i in range(threads)]
 
     for user in usrs:
         t = threading.Thread(target=gen_events, args=(user, movies))

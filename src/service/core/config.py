@@ -41,9 +41,8 @@ class Settings(BaseSettings):
 settings = Settings()
 
 if settings.debug:
-    LOGGING['root']['level'] = "DEBUG"
+    LOGGING["root"]["level"] = "DEBUG"
 
 logging_config.dictConfig(LOGGING)
 
 logging.debug("%s", settings.dict())
-

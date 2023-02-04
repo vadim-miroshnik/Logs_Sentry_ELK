@@ -4,7 +4,6 @@ import pymongo
 
 
 class Mongodb(Storage):
-
     def __init__(self, mongodb: pymongo.MongoClient, db: str, coll: str):
         self.mongodb = mongodb
         self.db = db

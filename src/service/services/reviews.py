@@ -47,9 +47,7 @@ class ReviewsService:
     async def del_score(self, review_id: str, user_id: str):
         review = await self.stor.select({"_id": review_id})
         if review:
-            return await self.stor.update(
-                {"_id": review_id}, {"$pull": {"scores": {"user_id": user_id}}}
-            )
+            return await self.stor.update({"_id": review_id}, {"$pull": {"scores": {"user_id": user_id}}})
         return None
 
     async def get(self, movie_id: str):

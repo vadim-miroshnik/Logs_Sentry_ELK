@@ -52,9 +52,7 @@ app.openapi = custom_openapi
 
 @app.on_event("startup")
 async def startup_event():
-    kafka.producer = AIOKafkaProducer(
-        bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}"
-    )
+    kafka.producer = AIOKafkaProducer(bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}")
     await kafka.producer.start()
 
     # mongodb.mongodb = pymongo.MongoClient(
@@ -73,9 +71,11 @@ app.include_router(reviews.router, prefix="/api/v1/reviews", tags=["reviews"])
 app.include_router(movies.router, prefix="/api/v1/movies", tags=["movies"])
 app.include_router(bookmarks.router, prefix="/api/v1/bookmarks", tags=["bookmarks"])
 
+
 @app.get("/sentry-debug")
 async def trigger_error():
     division_by_zero = 1 / 0
+
 
 if __name__ == "__main__":
     uvicorn.run(

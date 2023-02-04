@@ -55,5 +55,5 @@ setup_etl:
 gen_views:
 	python ./src/gen_events/gen_views.py
 
-run_prod: run_environment
+run_prod: run_environment run_mongodb
 	docker-compose -f docker-compose.yml -f docker-compose_kafka.yml up -d --build ugc nginx

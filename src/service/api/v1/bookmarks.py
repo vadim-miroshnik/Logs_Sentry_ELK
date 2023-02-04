@@ -7,8 +7,7 @@ from auth.auth_bearer import JWTBearer
 from bson import json_util
 from db.kafka_service import get_kafka_service
 from db.mongodb import get_mongodb_bookmarks
-from fastapi import (APIRouter, Body, Depends, Header, HTTPException, Query,
-                     Request)
+from fastapi import APIRouter, Body, Depends, Header, HTTPException, Query, Request
 from services.bookmarks import BookmarksService
 from storage.kafka import KafkaService
 

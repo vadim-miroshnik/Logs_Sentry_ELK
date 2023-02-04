@@ -1,12 +1,12 @@
 """"""
 
+import random
 import time
 import uuid
-import random
 from datetime import datetime
+
 import vertica_python
 from tqdm.contrib.concurrent import process_map
-
 
 user_ids = [str(uuid.uuid4()) for _ in range(100)]
 movie_ids = [str(uuid.uuid4()) for _ in range(1000)]
@@ -39,6 +39,7 @@ def create_views_table():
         )
         cursor.execute("DELETE FROM views")
         connection.commit()
+
 
 def gen_event() -> tuple:
     event = (
@@ -73,7 +74,7 @@ def generate_data():
     process_map(gen_events, range(0, 10000), max_workers=4, chunksize=1)
     end = time.time()
     print(end - start)
-    with open("log.txt", 'a', encoding='utf-8') as file:
+    with open("log.txt", "a", encoding="utf-8") as file:
         file.write(f"Insert 10000000 events = {str(end - start)}\n")
 
 
