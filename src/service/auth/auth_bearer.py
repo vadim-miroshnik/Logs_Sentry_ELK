@@ -30,3 +30,6 @@ class JWTBearer(HTTPBearer):
         except:
             payload = None
         return payload
+
+
+auth = JWTBearer()

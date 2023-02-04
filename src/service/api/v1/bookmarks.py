@@ -3,7 +3,7 @@ import uuid
 from http import HTTPStatus
 from uuid import UUID
 
-from auth.auth_bearer import JWTBearer
+from auth.auth_bearer import auth
 from bson import json_util
 from db.kafka_service import get_kafka_service
 from db.mongodb import get_mongodb_bookmarks
@@ -27,7 +27,7 @@ router = APIRouter()
     summary="Добавление закладки на фильм",
     description="Добавление закладки на фильм",
     tags=["bookmarks"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def add_bookmark(
     request: Request,
@@ -59,7 +59,7 @@ async def add_bookmark(
     summary="Получение закладок на фильмы",
     description="Получение закладок на фильмы",
     tags=["bookmarks"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def get_bookmark(
     request: Request, service: BookmarksService = Depends(get_mongodb_bookmarks)
@@ -78,7 +78,7 @@ async def get_bookmark(
     },
     summary="Удаление закладки",
     tags=["bookmarks"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def delete_bookmark(
     request: Request,

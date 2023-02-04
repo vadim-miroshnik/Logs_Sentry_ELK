@@ -3,7 +3,7 @@ import uuid
 from http import HTTPStatus
 from uuid import UUID
 
-from auth.auth_bearer import JWTBearer
+from auth.auth_bearer import auth
 from bson import json_util
 from db.kafka_service import get_kafka_service
 from db.mongodb import get_mongodb_movies
@@ -27,7 +27,7 @@ router = APIRouter()
     summary="Добавление оценки к фильму",
     description="Добавление/изменение/удаление оценки к фильму",
     tags=["movies"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def add_score(
     request: Request,
@@ -62,7 +62,7 @@ async def add_score(
     summary="Изменение оценки к фильму",
     description="Изменение оценки к фильму",
     tags=["movies"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def update_score(
     request: Request,
@@ -96,7 +96,7 @@ async def update_score(
     },
     summary="Удаление оценки",
     tags=["movies"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def delete_score(
     request: Request,
@@ -120,7 +120,7 @@ async def delete_score(
     description="Получение средней оценки фильма, количество лайков/дизлайков",
     response_description="Оценка фильма",
     tags=["movies"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def get_score(
     request: Request,

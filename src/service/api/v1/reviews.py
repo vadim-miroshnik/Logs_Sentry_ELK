@@ -4,7 +4,7 @@ from datetime import datetime
 from http import HTTPStatus
 from uuid import UUID
 
-from auth.auth_bearer import JWTBearer
+from auth.auth_bearer import auth
 from bson import json_util
 from db.kafka_service import get_kafka_service
 from db.mongodb import get_mongodb_reviews
@@ -28,7 +28,7 @@ router = APIRouter()
     summary="Создание рецензии на фильм",
     description="При создании рецензии передается текст, дата публикации и оценка фильма",
     tags=["reviews"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def add_review(
     request: Request,
@@ -74,7 +74,7 @@ async def add_review(
     summary="Обновление рецензии на фильм",
     description="При обновлении рецензии передается текст, дата публикации и оценка фильма",
     tags=["reviews"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def update_review(
     request: Request,
@@ -118,7 +118,7 @@ async def update_review(
     summary="Оценка рецензии на фильм",
     description="Оценка рецензии на фильм",
     tags=["reviews"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def score_review(
     request: Request,
@@ -156,7 +156,7 @@ async def score_review(
     summary="Удаление оценки рецензии на фильм",
     description="Удаление оценки рецензии на фильм",
     tags=["reviews"],
-    dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def del_score_review(
     request: Request,
@@ -188,7 +188,7 @@ async def del_score_review(
     summary="Получение списка рецензий",
     description="Получение списка рецензий",
     tags=["reviews"],
-    # dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(auth)],
 )
 async def get_reviews(
     request: Request,
