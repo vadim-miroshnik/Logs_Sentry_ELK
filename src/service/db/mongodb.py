@@ -11,7 +11,7 @@ from core.config import settings
 
 mongodb: AsyncIOMotorClient | None = None
 mongodb = AsyncIOMotorClient(
-    "mongodb://mongos1:27017/?serverSelectionTimeoutMS=2000&directConnection=true&uuidRepresentation=standard"
+    f"mongodb://{settings.mongo.host}:{settings.mongo.port}/?serverSelectionTimeoutMS=2000&directConnection=true"
 )
 
 
