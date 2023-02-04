@@ -22,6 +22,7 @@ services:
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./configs/conf.d:/etc/nginx/conf.d:ro
+      - /tmp/logs/nginx/:/var/log/nginx/
     ports:
       - "80:80"
     networks:
@@ -29,10 +30,53 @@ services:
     depends_on:
       - ugc
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.10.2
+    environment:
+      XPACK_MONITORING_ENABLED: "false"
+      ES_HOST: "elasticsearch:9200"
+    ports:
+      - "5044:5044/udp"
+    volumes:
+      - ./configs/logstash.conf:/config/logstash.conf:ro
+    command: logstash -f /config/logstash.conf
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false
+    ports:
+      - 9200:9200
+    volumes:
+      - /tmp/esdata:/tmp/elasticsearch/data
+
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.2
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.10.2
+    volumes:
+      - /tmp/logs/nginx:/var/log/nginx:ro
+      - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    depends_on:
+      - ugc
+      - nginx
+      - logstash
+      - elasticsearch
+      - kibana
+    links:
+      - logstash
+
 networks:
-    movies:
-      name: movies
+  movies:
+    name: movies
 
 volumes:
-    postgres:
-    pgadmin:
+  postgres:
+  pgadmin:

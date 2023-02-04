@@ -1,23 +1,30 @@
 import asyncio
 
+import pymongo
+import sentry_sdk
 import uvicorn
 from aiokafka import AIOKafkaProducer
-from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
-from fastapi.openapi.utils import get_openapi
-import pymongo
-
-from api.v1 import watching, reviews, movies, bookmarks
+from api.v1 import bookmarks, movies, reviews, watching
 from core.config import settings
 from db import kafka, mongodb
+from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import ORJSONResponse
+
+sentry_sdk.init(
+    dsn=settings.sentry_dsn,
+    traces_sample_rate=1.0,
+)
+
 
 app = FastAPI(
     title=settings.project_name,
     docs_url="/api/openapi",
     openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
-    swagger_ui_parameters={"syntaxHighlight": False}
+    swagger_ui_parameters={"syntaxHighlight": False},
 )
+
 
 def custom_openapi():
     if not app.openapi_schema:
@@ -30,13 +37,13 @@ def custom_openapi():
             tags="",
             servers="",
         )
-        for _, method_item in app.openapi_schema.get('paths').items():
+        for _, method_item in app.openapi_schema.get("paths").items():
             for _, param in method_item.items():
-                responses = param.get('responses')
-                if '422' in responses:
-                    del responses['422']
-                if '200' in responses:
-                    del responses['200']
+                responses = param.get("responses")
+                if "422" in responses:
+                    del responses["422"]
+                if "200" in responses:
+                    del responses["200"]
     return app.openapi_schema
 
 
@@ -45,7 +52,9 @@ app.openapi = custom_openapi
 
 @app.on_event("startup")
 async def startup_event():
-    kafka.producer = AIOKafkaProducer(bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}")
+    kafka.producer = AIOKafkaProducer(
+        bootstrap_servers=f"{settings.kafka.host}:{settings.kafka.port}"
+    )
     await kafka.producer.start()
 
     # mongodb.mongodb = pymongo.MongoClient(
@@ -63,6 +72,10 @@ app.include_router(watching.router, prefix="/api/v1/watching", tags=["films"])
 app.include_router(reviews.router, prefix="/api/v1/reviews", tags=["reviews"])
 app.include_router(movies.router, prefix="/api/v1/movies", tags=["movies"])
 app.include_router(bookmarks.router, prefix="/api/v1/bookmarks", tags=["bookmarks"])
+
+@app.get("/sentry-debug")
+async def trigger_error():
+    division_by_zero = 1 / 0
 
 if __name__ == "__main__":
     uvicorn.run(
