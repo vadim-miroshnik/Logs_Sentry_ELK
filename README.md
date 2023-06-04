@@ -1,11 +1,3 @@
-# Проектная работа 9 спринта
-
-https://github.com/dimkaddi/ugc_sprint_2
-
-## Исследование
-
-Обновлено описание [здесь](src/research/README.md)
-
 ## Работа с проектом
 
 запуск MongoDB: 
@@ -19,10 +11,6 @@ https://github.com/dimkaddi/ugc_sprint_2
 Для запуска сервиса в проде (отключить проброс портов сервиса и запустить nginx):
 
     make run_prod
-
-# Проектная работа 8 спринта
-
-https://github.com/dimkaddi/ugc_sprint_1
 
 Запуск окружения (кафка и кликхаус):
 
