@@ -1,5 +1,4 @@
-## Работа с проектом
-
+## Запуск
 запуск MongoDB: 
     
     make run_environment
